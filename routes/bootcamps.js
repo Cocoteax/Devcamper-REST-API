@@ -18,6 +18,11 @@ router
   .put(bootcampController.updateBootcamp)
   .delete(bootcampController.deleteBootcamp);
 
+// /api/v1/bootcamps/radius/:zipcode/:distance
+router
+  .route("/radius/:zipcode/:distance")
+  .get(bootcampController.getBootcampsInRadius);
+
 // ========== Alternative syntax to specify routes one by one ========== //
 
 // // /api/v1/bootcamps => GET
