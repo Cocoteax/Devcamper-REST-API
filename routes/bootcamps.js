@@ -3,6 +3,14 @@ const router = express.Router();
 
 const bootcampController = require("../controllers/bootcamps");
 
+// Include other resource routers
+const courseRouter = require("./courses");
+
+// ========== Re-route to other resource routers ==========
+
+// /api/v1/bootcamps/:bootcampID/courses will be re-routed to courseRouter
+router.use("/:bootcampID/courses", courseRouter);
+
 // ========== Neat way of specifying routes by grouping them up based on endpoints ========== //
 
 // /api/v1/bootcamps => GET, POST
@@ -40,4 +48,4 @@ router
 // // /api/v1/bootcamps => DELETE
 // router.delete("/:id", bootcampController.deleteBootcamp);
 
-module.exports = { router };
+module.exports = router;

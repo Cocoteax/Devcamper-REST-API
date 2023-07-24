@@ -13,6 +13,7 @@ const NODE_ENV = process.env.NODE_ENV; // Get node env from npm scripts
 
 // Import routes
 const bootcampRoutes = require("./routes/bootcamps");
+const courseRoutes = require("./routes/courses");
 
 // ========== Set up middlewares ========== //
 // Body parser for accessing request body
@@ -25,7 +26,8 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // ========== Set up routes ========== //
-app.use("/api/v1/bootcamps", bootcampRoutes.router);
+app.use("/api/v1/bootcamps", bootcampRoutes);
+app.use("/api/v1/courses", courseRoutes);
 
 // Error handler middleware
 // NOTE: This middleware must come after routes since we pass the error to errorHandler by calling next() within controllers
