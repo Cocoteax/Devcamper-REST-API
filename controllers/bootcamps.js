@@ -1,6 +1,7 @@
 const Bootcamp = require("../models/Bootcamp");
 const geocoder = require("../utils/geocoder");
 const ErrorResponse = require("../utils/errorResponse"); // Custom error response
+const Course = require("../models/Course");
 
 // @desc    Get all bootcamps (w/ query strings for filtering, selecting, sorting)
 // @route   GET /api/v1/bootcamps/?
@@ -26,7 +27,8 @@ const getAllBootcamps = async (req, res, next) => {
 
     // Pass req.query object into find() and it'll automatically filter for us
     // NOTE: query is just a promise that hasn't been executed yet => This allows us to chain on other methods if needed before executing query
-    query = Bootcamp.find(JSON.parse(queryStr));
+    // NOTE: we reverse populate courses into bootcamp using virtuals (See Bootcamp.js model)
+    query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
 
     // Select fields
     if (req.query.select) {
@@ -161,14 +163,15 @@ const updateBootcamp = async (req, res, next) => {
 // @access  Private
 const deleteBootcamp = async (req, res, next) => {
   try {
-    const bootcampID = req.params.id;
-    const bootcamp = await Bootcamp.findByIdAndDelete(bootcampID);
+    const bootcamp = await Bootcamp.findById(req.params.id);
     // If no existing bootcamp
     if (!bootcamp) {
       return next(
         new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
       );
     }
+    // NOTE: By calling .deleteOne() on the document itself and not the query, it triggers the document middleware to remove all bootcamp courses (See Bootcamp.js model)
+    bootcamp.deleteOne(); // Remove bootcamp
     return res.status(200).json({
       success: true,
       data: {},

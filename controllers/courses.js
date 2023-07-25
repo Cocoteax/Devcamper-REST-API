@@ -25,7 +25,12 @@ const getCourses = async (req, res, next) => {
     }
     // Get all courses
     else {
-      query = Course.find();
+      // .populate() returns the fields of the other model (bootcamps)
+      // Pass in a config object continaining the path of the foreign key (bootcamp) within the Course model and select specific fields if needed
+      query = Course.find().populate({
+        path: "bootcamp",
+        select: "name description",
+      });
     }
 
     // Execute query
