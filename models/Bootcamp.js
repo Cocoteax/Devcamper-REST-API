@@ -141,6 +141,7 @@ BootcampSchema.pre("save", async function (next) {
 // Use mongoose pre middleware to cascade delete courses when a bootcamp is deleted (bootcamps has a 1-to-many r/s with courses)
 // NOTE: "deleteOne" is registered as a query middleware by default, hence this refers to the query and not the document
 // NOTE: To register "deleteOne" as a document middleware so that we can access the bootcamp document using "this", we pass in the second argument
+// https://mongoosejs.com/docs/middleware.html#types-of-middleware
 BootcampSchema.pre(
   "deleteOne",
   { document: true, query: false },
