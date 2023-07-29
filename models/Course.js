@@ -43,7 +43,6 @@ const CourseSchema = new Schema({
 // NOTE: static schema method is called by directly accessing the model, while schema method is called from an instance of schema
 // NOTE: we use function key to allow "this" keyword to refer to the schema
 CourseSchema.statics.getAverageCost = async function (bootcampID) {
-  console.log(`Calculating avg cost...`);
 
   // Create an aggregation pipeline to calculate average cost
   // Data passed through this aggregation pipeline gets transformed by each stage, eventually producing a new document at the end of pipeline

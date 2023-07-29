@@ -31,6 +31,9 @@ router
   .route("/radius/:zipcode/:distance")
   .get(bootcampController.getBootcampsInRadius);
 
+// /api/v1/bootcamps/:id/photo
+router.route("/:id/photo").put(bootcampController.bootcampPhotoUpload);
+
 // ========== Alternative syntax to specify routes one by one ========== //
 
 // // /api/v1/bootcamps => GET

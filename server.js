@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
+const path = require("path");
+const fileupload = require("express-fileupload");
 const errorHandler = require("./middleware/error");
 const morgan = require("morgan"); // 3rd party logger
 const connectDB = require("./config/db");
@@ -24,6 +26,13 @@ app.use(bodyParser.json()); // For JSON input
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+// File uploading
+app.use(fileupload());
+
+// Set static folder for serving static files such as images
+// This allows the internet to be able to retrieve files from the local static folder by going to domain/public/filePath
+app.use(express.static(path.join(__dirname, "public")));
 
 // ========== Set up routes ========== //
 app.use("/api/v1/bootcamps", bootcampRoutes);
