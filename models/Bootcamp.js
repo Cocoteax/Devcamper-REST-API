@@ -7,7 +7,7 @@ const BootcampSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, "Please add a name"], // This is how to add a custom message when attribute is not satisfied
+      required: [true, "Please add a name"], // This is how to add a custom message when attribute is not satisfied (Accessed via error.js validationError)
       unique: true,
       trim: true, // Remove whitespace
       maxLength: [50, "Name cannot be more than 50 characters"],
