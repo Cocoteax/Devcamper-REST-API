@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const bootcampController = require("../controllers/bootcamps");
+const Bootcamp = require("../models/Bootcamp");
+const advancedResults = require("../middleware/advancedResults");
 
 // Include other resource routers
 const courseRouter = require("./courses");
@@ -16,7 +18,7 @@ router.use("/:bootcampID/courses", courseRouter);
 // /api/v1/bootcamps => GET, POST
 router
   .route("/")
-  .get(bootcampController.getAllBootcamps)
+  .get(advancedResults(Bootcamp, "courses"), bootcampController.getAllBootcamps) // This end-point pass through each middleware from left-to-right in order
   .post(bootcampController.createBootcamp);
 
 // /api/v1/bootcamps/:id => GET, PUT, DELETE
