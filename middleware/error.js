@@ -8,19 +8,19 @@ const errorHandler = (err, req, res, next) => {
   // Check for different types of errors based on err.name and handle them accordingly using our custom ErrorReponse
   // Mongoose bad ObjectID
   if (err.name === "CastError") {
-    const message = `Resource not found with if of ${err.value}`; // err.value is a property of err that contains invalid objectID
+    const message = `Resource not found with id of ${err.value}`; // err.value is a property of err that contains invalid objectID
     error = new ErrorReponse(message, 404); // Update error using our custom ErrorReponse object
   }
 
   // Mongoose duplicate keys
   if (err.code === 11000) {
-    const message = `Duplicate field value entered`;
+    const message = `Duplicate field value entered for ${Object.keys(err.keyValue)}`;
     error = new ErrorReponse(message, 400);
   }
 
   // Mongoose validation error (Missing required fields)
   if (err.name === "ValidationError") {
-    const message = Object.values(err.errors).map((val) => val.message); // Object.values() return all values from an object (excluding keys)
+    const message = Object.values(err.errors).map((val) => `${val.message} for the ${val.path} field`); // Object.values() return all values from an object (excluding keys)
     error = new ErrorReponse(message.join(", "), 400);
   }
 

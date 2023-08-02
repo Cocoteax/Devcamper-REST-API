@@ -72,7 +72,8 @@ CourseSchema.statics.getAverageCost = async function (bootcampID) {
   }
 };
 
-// Use post middleware to calculate average cost of courses after saving a course
+// Use post hook middleware to calculate average cost of courses after saving a course
+// NOTE: For post hooks, we don't need to call next(). It will be called automatically by mongoose
 CourseSchema.post("save", async function () {
   // Call static method to get average cost with this.constructor.static_method_name()
   await this.constructor.getAverageCost(this.bootcamp);

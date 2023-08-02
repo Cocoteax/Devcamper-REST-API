@@ -111,8 +111,9 @@ const BootcampSchema = new Schema(
 );
 
 // Use mongoose pre middleware to add a slug from the name field before saving the document
+// NOTE: "save" is registered as a document middleware by default, hence "this" refers to the document
 BootcampSchema.pre("save", function (next) {
-  this.slug = slugify(this.name, { lower: true }); // Inside a mongoose middleware, "this" refers to the current document
+  this.slug = slugify(this.name, { lower: true });
   next();
 });
 
@@ -139,7 +140,7 @@ BootcampSchema.pre("save", async function (next) {
 });
 
 // Use mongoose pre middleware to cascade delete courses when a bootcamp is deleted (bootcamps has a 1-to-many r/s with courses)
-// NOTE: "deleteOne" is registered as a query middleware by default, hence this refers to the query and not the document
+// NOTE: "deleteOne" is registered as a query middleware by default, hence "this" refers to the query and not the document
 // NOTE: To register "deleteOne" as a document middleware so that we can access the bootcamp document using "this", we pass in the second argument
 // https://mongoosejs.com/docs/middleware.html#types-of-middleware
 BootcampSchema.pre(
