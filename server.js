@@ -6,6 +6,7 @@ const path = require("path");
 const fileupload = require("express-fileupload");
 const errorHandler = require("./middleware/error");
 const morgan = require("morgan"); // 3rd party logger
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 
 // Load env variables from config.env file into process.env
@@ -22,6 +23,9 @@ const authRoutes = require("./routes/auth");
 // Body parser for accessing request body
 app.use(bodyParser.urlencoded({ extended: false })); // For FORM html elements
 app.use(bodyParser.json()); // For JSON input
+
+// Cookie parser for setting & accessing cookies
+app.use(cookieParser());
 
 // Logger for dev environment
 if (process.env.NODE_ENV === "development") {

@@ -17,13 +17,8 @@ const registerUser = async (req, res, next) => {
       role,
     });
 
-    // Get JWT for user
-    const token = user.getSignedJwtToken();
-
-    res.status(200).json({
-      success: true,
-      token: token,
-    });
+    // Registration successful, send back token response
+    sendTokenResponse(user, 200, res);
   } catch (e) {
     next(e);
   }
@@ -56,18 +51,52 @@ const loginUser = async (req, res, next) => {
       return next(new ErrorResponse(`Invalid Credentials`, 401));
     }
 
-    // Valid user, retrieve JWT and return
-    const token = user.getSignedJwtToken();
+    // Valid user, send back token response
+    sendTokenResponse(user, 200, res);
+  } catch (e) {
+    next(e);
+  }
+};
+
+// @desc    Get current logged in user
+// @route   POST /api/v1/auth/me
+// @access  PRIVATE
+const getCurrentUser = async (req, res, next) => {
+  try {
     res.status(200).json({
       success: true,
-      token: token,
+      data: req.user, // req.user is set by protectRoute middleware
     });
   } catch (e) {
     next(e);
   }
 };
 
+// Custom function to get token from model, set cookie, and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  const token = user.getSignedJwtToken();
+  const options = {
+    // Date(ms) => Need to set expires to 30 days
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 1000 * 60 * 60 * 24
+    ),
+    httpOnly: true, // Ensure cookies can only be manipulated by server and not client
+  };
+
+  // Set secure flag HTTPS if in production
+  if (process.env.NODE_ENV === "production") {
+    options.secure = true;
+  }
+
+  // Send back response with status and set cookie with res.cookie
+  res.status(statusCode).cookie("token", token, options).json({
+    success: true,
+    token: token,
+  });
+};
+
 module.exports = {
   registerUser,
+  getCurrentUser,
   loginUser,
 };

@@ -4,6 +4,7 @@ const router = express.Router();
 const bootcampController = require("../controllers/bootcamps");
 const Bootcamp = require("../models/Bootcamp");
 const advancedResults = require("../middleware/advancedResults");
+const { protectRoute } = require("../middleware/auth");
 
 // Include other resource routers
 const courseRouter = require("./courses");
@@ -19,14 +20,14 @@ router.use("/:bootcampID/courses", courseRouter);
 router
   .route("/")
   .get(advancedResults(Bootcamp, "courses"), bootcampController.getAllBootcamps) // This end-point pass through each middleware from left-to-right in order
-  .post(bootcampController.createBootcamp);
+  .post(protectRoute, bootcampController.createBootcamp); // This route will be protected by protectRoute middleware and requires authentication
 
 // /api/v1/bootcamps/:id => GET, PUT, DELETE
 router
   .route("/:id")
   .get(bootcampController.getBootcamp)
-  .put(bootcampController.updateBootcamp)
-  .delete(bootcampController.deleteBootcamp);
+  .put(protectRoute, bootcampController.updateBootcamp)
+  .delete(protectRoute, bootcampController.deleteBootcamp);
 
 // /api/v1/bootcamps/radius/:zipcode/:distance
 router
@@ -34,7 +35,9 @@ router
   .get(bootcampController.getBootcampsInRadius);
 
 // /api/v1/bootcamps/:id/photo
-router.route("/:id/photo").put(bootcampController.bootcampPhotoUpload);
+router
+  .route("/:id/photo")
+  .put(protectRoute, bootcampController.bootcampPhotoUpload);
 
 // ========== Alternative syntax to specify routes one by one ========== //
 

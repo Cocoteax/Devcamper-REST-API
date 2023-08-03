@@ -43,7 +43,6 @@ const CourseSchema = new Schema({
 // NOTE: static schema method is called by directly accessing the model, while schema method is called from an instance of schema
 // NOTE: we use function key to allow "this" keyword to refer to the schema
 CourseSchema.statics.getAverageCost = async function (bootcampID) {
-
   // Create an aggregation pipeline to calculate average cost
   // Data passed through this aggregation pipeline gets transformed by each stage, eventually producing a new document at the end of pipeline
   // https://www.mongodb.com/docs/manual/reference/method/db.collection.aggregate/
@@ -61,7 +60,6 @@ CourseSchema.statics.getAverageCost = async function (bootcampID) {
       },
     },
   ]);
-
   // Store our averageCost data of courses from the aggregation pipeline into the specific bootcamp model in our database
   try {
     await mongoose.model("Bootcamp").findByIdAndUpdate(bootcampID, {
