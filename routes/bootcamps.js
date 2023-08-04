@@ -4,7 +4,7 @@ const router = express.Router();
 const bootcampController = require("../controllers/bootcamps");
 const Bootcamp = require("../models/Bootcamp");
 const advancedResults = require("../middleware/advancedResults");
-const { protectRoute } = require("../middleware/auth");
+const { protectRoute, authorizeRoles } = require("../middleware/auth");
 
 // Include other resource routers
 const courseRouter = require("./courses");
@@ -20,14 +20,26 @@ router.use("/:bootcampID/courses", courseRouter);
 router
   .route("/")
   .get(advancedResults(Bootcamp, "courses"), bootcampController.getAllBootcamps) // This end-point pass through each middleware from left-to-right in order
-  .post(protectRoute, bootcampController.createBootcamp); // This route will be protected by protectRoute middleware and requires authentication
+  .post(
+    protectRoute,
+    authorizeRoles("publisher", "admin"),
+    bootcampController.createBootcamp
+  ); // This route will be protected by protectRoute middleware, requiring user authentication as well as role authorization
 
 // /api/v1/bootcamps/:id => GET, PUT, DELETE
 router
   .route("/:id")
   .get(bootcampController.getBootcamp)
-  .put(protectRoute, bootcampController.updateBootcamp)
-  .delete(protectRoute, bootcampController.deleteBootcamp);
+  .put(
+    protectRoute,
+    authorizeRoles("publisher", "admin"),
+    bootcampController.updateBootcamp
+  )
+  .delete(
+    protectRoute,
+    authorizeRoles("publisher", "admin"),
+    bootcampController.deleteBootcamp
+  );
 
 // /api/v1/bootcamps/radius/:zipcode/:distance
 router
@@ -37,7 +49,11 @@ router
 // /api/v1/bootcamps/:id/photo
 router
   .route("/:id/photo")
-  .put(protectRoute, bootcampController.bootcampPhotoUpload);
+  .put(
+    protectRoute,
+    authorizeRoles("publisher", "admin"),
+    bootcampController.bootcampPhotoUpload
+  );
 
 // ========== Alternative syntax to specify routes one by one ========== //
 

@@ -38,6 +38,24 @@ const protectRoute = async (req, res, next) => {
   }
 };
 
+// Middleware to grant access to specific roles
+// NOTE: this middleware accepts an array of roles and returns a middleware to authorize these roles
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    // req.user is accessible since this middlware will always pass through protectRoute middleware first
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          `User role ${req.user.role} is not authorized to access this route`,
+          403
+        )
+      );
+    }
+    next();
+  };
+};
+
 module.exports = {
   protectRoute,
+  authorizeRoles,
 };
