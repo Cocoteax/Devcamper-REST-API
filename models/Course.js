@@ -37,6 +37,11 @@ const CourseSchema = new Schema({
     required: true,
     ref: "Bootcamp",
   },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
 });
 
 // Define a static schema method to calculate average cost of courses for a bootcamp through aggregation

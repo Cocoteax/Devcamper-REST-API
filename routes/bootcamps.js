@@ -24,7 +24,7 @@ router
     protectRoute,
     authorizeRoles("publisher", "admin"),
     bootcampController.createBootcamp
-  ); // This route will be protected by protectRoute middleware, requiring user authentication as well as role authorization
+  ); // This route will be protected by protectRoute and authorizeRoles middlewares, requiring user authentication as well as role authorization
 
 // /api/v1/bootcamps/:id => GET, PUT, DELETE
 router

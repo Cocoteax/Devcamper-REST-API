@@ -49,6 +49,22 @@ const getBootcamp = async (req, res, next) => {
 // @access  Private
 const createBootcamp = async (req, res, next) => {
   try {
+    // Add user to req.body through our authentication middlewares which contains req.user
+    req.body.user = req.user.id;
+
+    // Check for published bootcamp
+    const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+
+    // If user is not admin, they can only add one bootcamp
+    if (publishedBootcamp && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `The user with ID ${req.user.id} has already published a bootcamp`,
+          400
+        )
+      );
+    }
+
     const bootcamp = await Bootcamp.create(req.body); // Alternatively, create a new Bootcamp object and .save()
     return res.status(200).json({
       success: true,
@@ -65,8 +81,27 @@ const createBootcamp = async (req, res, next) => {
 const updateBootcamp = async (req, res, next) => {
   try {
     const bootcampID = req.params.id;
+    let bootcamp = await Bootcamp.findById(req.params.id);
+
+    // If no existing bootcamp
+    if (!bootcamp) {
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+      );
+    }
+
+    // Ensure user is the bootcamp owner OR has admin role
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `User ${req.user.id} is not authorized to update this bootcamp`,
+          401
+        )
+      );
+    }
+
     // findByIdAndUpdate accepts 4 parameters: filter, update, options, callback
-    const bootcamp = await Bootcamp.findByIdAndUpdate(
+    bootcamp = await Bootcamp.findByIdAndUpdate(
       bootcampID,
       { $set: req.body },
       {
@@ -74,12 +109,6 @@ const updateBootcamp = async (req, res, next) => {
         runValidators: true,
       }
     );
-    // If no existing bootcamp
-    if (!bootcamp) {
-      return next(
-        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
-      );
-    }
     return res.status(200).json({
       success: true,
       data: bootcamp,
@@ -101,6 +130,17 @@ const deleteBootcamp = async (req, res, next) => {
         new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
       );
     }
+
+    // Ensure user is the bootcamp owner OR has admin role
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `User ${req.user.id} is not authorized to delete this bootcamp`,
+          401
+        )
+      );
+    }
+
     // NOTE: By calling .deleteOne() on the document itself and not the query, it triggers the document middleware to remove all bootcamp courses (See Bootcamp.js model)
     bootcamp.deleteOne(); // Remove bootcamp
     return res.status(200).json({
@@ -156,6 +196,17 @@ const bootcampPhotoUpload = async (req, res, next) => {
       );
     }
 
+    // Ensure user is the bootcamp owner OR has admin role
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `User ${req.user.id} is not authorized to upload photos for this bootcamp`,
+          401
+        )
+      );
+    }
+
+    console.log(req.files);
     // Check if a file has been sent through request using express-fileupload middleware
     if (!req.files) {
       return next(new ErrorResponse(`Please upload a file`, 400));

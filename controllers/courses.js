@@ -68,14 +68,26 @@ const getSingleCourse = async (req, res, next) => {
 // @access  PRIVATE
 const createCourse = async (req, res, next) => {
   try {
+    // Add user to req.body through our authentication middlewares which contains req.user
+    req.body.user = req.user.id;
     // Extract bootcampID from params to req.body since we don't expect user to put in bootcamp in the POST request
     req.body.bootcamp = req.params.bootcampID;
 
     // Check if bootcamp exists
-    const bootcamps = await Bootcamp.findById(req.params.bootcampID);
-    if (!bootcamps) {
+    const bootcamp = await Bootcamp.findById(req.params.bootcampID);
+    if (!bootcamp) {
       return next(
         new ErrorResponse(`Bootcamp not found with ID of ${req.params.id}`)
+      );
+    }
+
+    // Ensure user is the bootcamp owner OR has admin role
+    if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `User ${req.user.id} is not authorized to create courses for bootcamp ${bootcamp._id}`,
+          401
+        )
       );
     }
 
@@ -103,6 +115,17 @@ const updateCourse = async (req, res, next) => {
         404
       );
     }
+
+    // Ensure user is the course owner OR has admin role
+    if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `User ${req.user.id} is not authorized to update course ${course._id}`,
+          401
+        )
+      );
+    }
+
     // findByIdAndUpdate accepts 4 parameters: filter, update, options, callback
     course = await Course.findByIdAndUpdate(
       req.params.id,
@@ -132,6 +155,15 @@ const deleteCourse = async (req, res, next) => {
       return next(
         new ErrorResponse(`No course with id of ${req.params.id}`),
         404
+      );
+    }
+    // Ensure user is the course owner OR has admin role
+    if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+      return next(
+        new ErrorResponse(
+          `User ${req.user.id} is not authorized to delete course ${course._id}`,
+          401
+        )
       );
     }
     await course.deleteOne();
