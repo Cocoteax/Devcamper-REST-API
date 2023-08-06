@@ -13,4 +13,10 @@ router.route("/login").post(authController.loginUser);
 // /api/v1/auth/me
 router.route("/me").get(protectRoute, authController.getCurrentUser);
 
+// /api/v1/auth/forgotpassword
+router.route("/forgotpassword").post(authController.forgotPassword);
+
+// /api/v1/auth/resetpassword
+router.route("/resetpassword/:resetToken").put(authController.resetPassword);
+
 module.exports = router;

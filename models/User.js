@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const UserSchema = new Schema({
   name: {
@@ -58,6 +59,10 @@ const UserSchema = new Schema({
 
 // Use mongoose pre-middleware to encrypt password using bcryptjs before saving to db
 UserSchema.pre("save", async function (next) {
+  // Only run this middlware if password was modified
+  if (!this.isModified("password")) {
+    next();
+  }
   // To use bcryptjs, we need to generate a salt using genSalt
   // NOTE: genSalt() accepts the number of hashing rounds as an argument. 10 is sufficient
   const salt = await bcrypt.genSalt(10);
@@ -79,6 +84,26 @@ UserSchema.methods.getSignedJwtToken = function () {
 UserSchema.methods.validatePassword = async function (enteredPassword) {
   // To compare hashed passwords, use bcrypt.compare
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Schema method to generate and hash reset password token for the current document
+UserSchema.methods.getResetPasswordToken = async function () {
+  // Generate token
+
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  // Hash reset token and store it into user.resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set user.resetPasswordExpire to 10 mins
+  this.resetPasswordExpire = Date.now() + 10 * 1000 * 60;
+
+  // Store into db, turn off validation checks to avoid duplicate field error since we are just updating a document
+  this.save({ validateBeforeSave: false });
+
+  return resetToken;
 };
 
 module.exports = mongoose.model("User", UserSchema, "users");
