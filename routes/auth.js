@@ -19,4 +19,12 @@ router.route("/forgotpassword").post(authController.forgotPassword);
 // /api/v1/auth/resetpassword
 router.route("/resetpassword/:resetToken").put(authController.resetPassword);
 
+// /api/v1/auth/updatedetails
+router.route("/updatedetails").put(protectRoute, authController.updateDetails);
+
+// /api/v1/auth/updatepassword
+router
+  .route("/updatepassword")
+  .put(protectRoute, authController.updatePassword);
+
 module.exports = router;

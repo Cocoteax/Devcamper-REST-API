@@ -151,6 +151,57 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+// @desc    Update user details
+// @route   PUT /api/v1/auth/updatedetails
+// @access  PRIVATE
+const updateDetails = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { name: req.body.name, email: req.body.email } },
+      { new: true, runValidators: true } // new:true gives us back the updated user document
+    );
+
+    if (!user) {
+      return next(new ErrorResponse("User is not valid", 400));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+// @desc    Update user password
+// @route   PUT /api/v1/auth/updatepassword
+// @access  PRIVATE
+const updatePassword = async (req, res, next) => {
+  try {
+    // Need to bring in password field so we can use schema method to validate password
+    let user = await User.findById(req.user.id).select("+password");
+    if (!user) {
+      return next(new ErrorResponse("User is not valid", 400));
+    }
+
+    // Validate old password
+    const validOldPassword = await user.validatePassword(req.body.oldPassword);
+    if (!validOldPassword) {
+      return next(new ErrorResponse("Password is incorrect", 401));
+    }
+
+    // Update the password with .save() to allow pre-hook to encrypt password with bcrypt
+    user.password = req.body.newPassword;
+    await user.save({ validateBeforeSave: false });
+
+    sendTokenResponse(user, 200, res);
+  } catch (e) {
+    next(e);
+  }
+};
+
 // Custom function to get token from model, set cookie, and send response
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
@@ -180,4 +231,6 @@ module.exports = {
   loginUser,
   forgotPassword,
   resetPassword,
+  updateDetails,
+  updatePassword,
 };
