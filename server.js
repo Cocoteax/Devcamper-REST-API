@@ -7,6 +7,12 @@ const fileupload = require("express-fileupload");
 const errorHandler = require("./middleware/error");
 const morgan = require("morgan"); // 3rd party logger
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize"); // Prevent sql injections
+const helmet = require("helmet"); // Add security headers
+const { xss } = require("express-xss-sanitizer"); // Prevent XSS attacks
+const rateLimit = require("express-rate-limit"); // Protect against request spamming
+const hpp = require("hpp"); // Protect against HTTP parameter pollution attacks
+const cors = require("cors");
 const connectDB = require("./config/db");
 
 // Load env variables from config.env file into process.env
@@ -36,6 +42,31 @@ if (process.env.NODE_ENV === "development") {
 
 // File uploading
 app.use(fileupload());
+
+// API security - Preventing SQL Injections
+app.use(mongoSanitize());
+
+// API security - Add security headers
+app.use(helmet());
+
+// API security - Prevent XSS attacks
+app.use(xss());
+
+// API security - Set a rate limit for requests to API
+app.use(
+  rateLimit({
+    windowMs: 10 * 1000 * 60, //10 mins
+    max: 100,
+    message:
+      "You can only make 100 requests every 10 mins. Please try again later.",
+  })
+);
+
+// API security - Prevent HPP attacks
+app.use(hpp());
+
+// Enable API to be public so that it can be accessed by different domains (Required for full stack applications)
+app.use(cors());
 
 // Set static folder for serving static files such as images
 // This allows the internet to be able to retrieve files from the local static folder by going to domain/public/filePath

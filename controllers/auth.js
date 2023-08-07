@@ -60,6 +60,33 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+// @desc    Log user out / clear cookie
+// @route   GET /api/v1/auth/logout
+// @access  PRIVATE
+const logoutUser = async (req, res, next) => {
+  try {
+    // Check if user is logged in by checking cookies
+    // NOTE: If we use bearer authentication, we can check if authorization header has been sent by client. If no, then return error.
+    if (!req.cookies.token) {
+      return next(new ErrorResponse(`User is currently not logged in`), 400);
+    }
+
+    // Set JWT to none when user logs out and make it expire in 10s
+    // NOTE: When cookie expires, it becomes cleared. Same effect as res.clearCookie("token")
+    res.cookie("token", "none", {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: "User successfully logged out",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 // @desc    Get current logged in user
 // @route   POST /api/v1/auth/me
 // @access  PRIVATE
@@ -227,8 +254,9 @@ const sendTokenResponse = (user, statusCode, res) => {
 
 module.exports = {
   registerUser,
-  getCurrentUser,
   loginUser,
+  logoutUser,
+  getCurrentUser,
   forgotPassword,
   resetPassword,
   updateDetails,
