@@ -18,6 +18,7 @@ const NODE_ENV = process.env.NODE_ENV; // Get node env from npm scripts
 const bootcampRoutes = require("./routes/bootcamps");
 const courseRoutes = require("./routes/courses");
 const authRoutes = require("./routes/auth");
+const adminRoutes = require("./routes/adminUser");
 
 // ========== Set up middlewares ========== //
 // Body parser for accessing request body
@@ -43,6 +44,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/bootcamps", bootcampRoutes);
 app.use("/api/v1/courses", courseRoutes);
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 // Error handler middleware
 // NOTE: This middleware must come after routes since we pass the error to errorHandler by calling next() within controllers
