@@ -44,9 +44,9 @@ const CourseSchema = new Schema({
   },
 });
 
-// Define a static schema method to calculate average cost of courses for a bootcamp through aggregation
+// Define a static schema method to calculate average cost of courses for a bootcamp through aggregation and save
 // NOTE: static schema method is called by directly accessing the model, while schema method is called from an instance of schema
-// NOTE: we use function key to allow "this" keyword to refer to the schema
+// NOTE: we use function key to allow "this" keyword to refer to the course schema
 CourseSchema.statics.getAverageCost = async function (bootcampID) {
   // Create an aggregation pipeline to calculate average cost
   // Data passed through this aggregation pipeline gets transformed by each stage, eventually producing a new document at the end of pipeline
@@ -60,7 +60,7 @@ CourseSchema.statics.getAverageCost = async function (bootcampID) {
     // https://www.mongodb.com/docs/manual/reference/operator/aggregation/group/
     {
       $group: {
-        _id: "$bootcamp", // Specify field to group by, each _id must be unique, so if there are multiple documents with same bootcamp, mongoDB will
+        _id: "$bootcamp", // Specify "group-by field" to group by. The output is one document for each "group-by field"
         averageCost: { $avg: "$tuition" }, // Use $avg to get average cost of courses for each group (bootcamp) and store into averageCost field
       },
     },
@@ -82,7 +82,7 @@ CourseSchema.post("save", async function () {
   await this.constructor.getAverageCost(this.bootcamp);
 });
 
-// Use pre middleware to calculate average cost of courses before removing a course
+// Use pre middleware to calculate average cost of courses after removing a course
 CourseSchema.post(
   "deleteOne",
   { document: true, query: false },

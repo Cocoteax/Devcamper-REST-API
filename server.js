@@ -19,6 +19,7 @@ const bootcampRoutes = require("./routes/bootcamps");
 const courseRoutes = require("./routes/courses");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/adminUser");
+const reviewRoutes = require("./routes/reviews");
 
 // ========== Set up middlewares ========== //
 // Body parser for accessing request body
@@ -45,6 +46,7 @@ app.use("/api/v1/bootcamps", bootcampRoutes);
 app.use("/api/v1/courses", courseRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
 
 // Error handler middleware
 // NOTE: This middleware must come after routes since we pass the error to errorHandler by calling next() within controllers

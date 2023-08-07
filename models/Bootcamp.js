@@ -144,7 +144,7 @@ BootcampSchema.pre("save", async function (next) {
   }
 });
 
-// Use mongoose pre middleware to cascade delete courses when a bootcamp is deleted (bootcamps has a 1-to-many r/s with courses)
+// Use mongoose pre middleware to cascade delete courses and reviews when a bootcamp is deleted (bootcamps has a 1-to-many r/s with courses and reviews)
 // NOTE: "deleteOne" is registered as a query middleware by default, hence "this" refers to the query and not the document
 // NOTE: To register "deleteOne" as a document middleware so that we can access the bootcamp document using "this", we pass in the second argument
 // https://mongoosejs.com/docs/middleware.html#types-of-middleware
@@ -152,8 +152,9 @@ BootcampSchema.pre(
   "deleteOne",
   { document: true, query: false },
   async function (next) {
-    console.log(`Courses being removed from bootcamp ${this._id}`);
+    console.log(`Courses and reviews being removed from bootcamp ${this._id}`);
     await mongoose.model("Course").deleteMany({ bootcamp: this._id }); // Remove all courses from this bootcamp
+    await mongoose.model("Review").deleteMany({ bootcamp: this._id }); // Remove all reviews from this bootcamp
     next();
   }
 );
@@ -166,5 +167,14 @@ BootcampSchema.virtual("courses", {
   foreignField: "bootcamp", // Field in the reference model that is the same as our foreign key
   justOne: false, // Return populated fields as an arrray
 });
+
+// // Reverse populating reviews into bootcamps with virtuals
+// // Bootcamp will have a dynamically calculated field called "reviews" populated with the Course fields if we use .populate() when finding a bootcamp document
+// BootcampSchema.virtual("reviews", {
+//   ref: "Review",
+//   localField: "_id",
+//   foreignField: "bootcamp",
+//   justOne: false,
+// });
 
 module.exports = mongoose.model("Bootcamp", BootcampSchema, "bootcamps");

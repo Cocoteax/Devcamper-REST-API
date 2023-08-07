@@ -8,11 +8,14 @@ const { protectRoute, authorizeRoles } = require("../middleware/auth");
 
 // Include other resource routers
 const courseRouter = require("./courses");
+const reviewRouter = require("./reviews");
 
 // ========== Re-route to other resource routers ==========
 
 // /api/v1/bootcamps/:bootcampID/courses will be re-routed to courseRouter
 router.use("/:bootcampID/courses", courseRouter);
+// /api/v1/bootcamps/:bootcampID/reviews will be re-routed to reviewRouter
+router.use("/:bootcampID/reviews", reviewRouter);
 
 // ========== Neat way of specifying routes by grouping them up based on endpoints ========== //
 

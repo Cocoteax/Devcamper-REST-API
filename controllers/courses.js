@@ -135,6 +135,8 @@ const updateCourse = async (req, res, next) => {
         runValidators: true,
       }
     );
+
+    await course.save() // .save() to activate the getAverageRating pre-hook middleware
     return res.status(200).json({
       success: true,
       data: course,

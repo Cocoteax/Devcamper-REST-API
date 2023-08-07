@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true }); // Set mergeParms true to allow re-routing from bootcamp router to course router
 
 const courseController = require("../controllers/courses");
 const advancedResults = require("../middleware/advancedResults");
