@@ -2,7 +2,8 @@
 > Devcamper is a RESTful API that enables users to create, manage, and search for coding bootcamps around the world.
 
 ## Usage
-> Please refer to API documentation [here](https://devcamper-rest-api.vercel.app/).
+> Please refer to API documentation [here](https://devcamper-rest-api.vercel.app/). </br>
+> Server is hosted using Vercel, so you can make requests to the respective API endpoints.
 
 ## Tech Stacks Used
 > NodeJS, ExpressJS, MongoDB Atlas, Mailtrap, Vercel
