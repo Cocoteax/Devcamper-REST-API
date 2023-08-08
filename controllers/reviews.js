@@ -47,7 +47,6 @@ const getReview = async (req, res, next) => {
       select: "name description",
     });
 
-    console.log("yes");
     // Check if review is valid
     if (!review) {
       return next(
