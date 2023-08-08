@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/User");
 
-// Middleware to authenticate users before they access a protected route (See route files on which routes are protected)
+// Middleware to authenticate users based on JWT before they access a protected route (See route files on which routes are protected)
+// NOTE: JWT will be returned from login and register route. Then, this middleware will authenticate user based on JWT and store user into req.user
 const protectRoute = async (req, res, next) => {
   try {
     let token;
