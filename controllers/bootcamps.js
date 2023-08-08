@@ -206,7 +206,6 @@ const bootcampPhotoUpload = async (req, res, next) => {
       );
     }
 
-    console.log(req.files);
     // Check if a file has been sent through request using express-fileupload middleware
     if (!req.files) {
       return next(new ErrorResponse(`Please upload a file`, 400));
