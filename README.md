@@ -7,7 +7,7 @@
 ## Tech Stacks Used
 > NodeJS, ExpressJS, MongoDB Atlas, Mailtrap, Vercel
 
-## Local Usage
+## Local Installation and Setup Instructions
 **Step 1**: Clone this repository </br>
 **Step 2**: Rename "config/config.env.env" to "config/config.env" and update the values/settings to your own </br>
 **Step 3**: Install dependencies:
