@@ -1,6 +1,6 @@
 const ErrorReponse = require("../utils/errorResponse");
 
-// @desc    Custom error handler for errors passed to express through an asynchronous fns (See catch block in controllers)
+// @desc    Custom error handler for errors passed to express through an asynchronous fns (Whenever we call next(error) inside a try or catch block (See controllers))
 const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message; // Append err.message property to error since spread operator doesn't copy it over
@@ -14,13 +14,17 @@ const errorHandler = (err, req, res, next) => {
 
   // Mongoose duplicate keys
   if (err.code === 11000) {
-    const message = `Duplicate field value entered for ${Object.keys(err.keyValue)}`;
+    const message = `Duplicate field value entered for ${Object.keys(
+      err.keyValue
+    )}`;
     error = new ErrorReponse(message, 400);
   }
 
   // Mongoose validation error (Missing required fields)
   if (err.name === "ValidationError") {
-    const message = Object.values(err.errors).map((val) => `${val.message} for the ${val.path} field`); // Object.values() return all values from an object (excluding keys)
+    const message = Object.values(err.errors).map(
+      (val) => `${val.message} for the ${val.path} field`
+    ); // Object.values() return all values from an object (excluding keys)
     error = new ErrorReponse(message.join(", "), 400);
   }
 
