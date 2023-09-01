@@ -69,7 +69,7 @@ app.use(hpp());
 app.use(cors());
 
 // Set static folder for serving static files such as images
-// This allows the internet to be able to retrieve files from the local static folder by going to domain/public/filePath
+// This allows the internet to be able to retrieve files from the local static folder by going to domain/uploads/filePath
 app.use(express.static(path.join(__dirname, "public")));
 
 // ========== Set up routes ========== //
@@ -87,6 +87,7 @@ app.use(errorHandler);
 const startApp = async () => {
   try {
     await connectDB();
+    console.log(path.join(__dirname, "public"));
     app.listen(
       PORT,
       console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`)
